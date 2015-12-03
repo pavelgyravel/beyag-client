@@ -14,9 +14,7 @@ module Erip
     end
 
     def payment(params)
-      response = build_response post('/payments', request: params)
-      puts "THIS IS RESPONSE => #{response.inspect}"
-      response
+      build_response post('/payments', request: params)
     end
 
     private
