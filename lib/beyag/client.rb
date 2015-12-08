@@ -1,6 +1,6 @@
 require 'logger'
 
-module Erip
+module Beyag
   class Client
 
     GATEWAY_URL = "https://api.bepaid.by/beyag"

@@ -1,6 +1,6 @@
 require "ostruct"
 
-module Erip
+module Beyag
   class Response
     attr_reader :response, :data
 

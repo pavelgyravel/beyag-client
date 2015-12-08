@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'erip/version'
+require 'beyag/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "erip"
-  spec.version       = EripClient::VERSION
+  spec.name          = "beyag"
+  spec.version       = Beyag::VERSION
   spec.authors       = ["Mac Shifford"]
   spec.email         = ["shiroginne@gmail.com"]
 
