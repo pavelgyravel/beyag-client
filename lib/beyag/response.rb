@@ -13,12 +13,24 @@ module Beyag
               end
     end
 
+    def id
+      transaction["id"]
+    end
+
+    def transaction
+      data["transaction"]
+    end
+
     def successful?
       (200..299).include?(status)
     end
 
     def error?
       errors.present?
+    end
+
+    def message
+      data["message"] || transaction["message"]
     end
 
     def errors

@@ -13,6 +13,10 @@ module Beyag
       @secret_key = params.fetch("secret_key")
     end
 
+    def query(params)
+      build_response get("/payments/?id=#{params["id"]}")
+    end
+
     def payment(params)
       build_response post('/payments', request: params)
     end
@@ -52,6 +56,10 @@ module Beyag
 
     def post(path, data = {})
       request { connection.post(GATEWAY_URL << path, data.to_json) }
+    end
+
+    def get(path, data = {})
+      request { connection.get(GATEWAY_URL << path) }
     end
 
   end
