@@ -13,8 +13,8 @@ module Beyag
       @secret_key = params.fetch("secret_key")
     end
 
-    def query(params)
-      build_response get("/payments/?id=#{params["id"]}")
+    def query(order_id)
+      build_response get("/payments/?id=#{order_id}")
     end
 
     def payment(params)
@@ -51,7 +51,8 @@ module Beyag
     end
 
     def build_response(response)
-      Response.new(response)
+      response = Response.new(response)
+      response
     end
 
     def post(path, data = {})

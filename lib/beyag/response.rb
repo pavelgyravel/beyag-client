@@ -17,6 +17,10 @@ module Beyag
       transaction["id"]
     end
 
+    def service_no
+      transaction["erip"]["service_no"]
+    end
+
     def transaction
       data["transaction"]
     end

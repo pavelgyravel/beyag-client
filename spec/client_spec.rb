@@ -116,7 +116,7 @@ RSpec.describe Beyag::Client do
   end
 
   describe '#query' do
-    let(:params) { { "id" => "bbb07d8b-eb16-40a3-97a7-7e52ae11c0e4" } }
+    let(:order_id) { "bbb07d8b-eb16-40a3-97a7-7e52ae11c0e4" }
 
     before {
       stub_request(:get, /api.bepaid.by\/beyag\/payment/).to_return(response_obj)
@@ -126,7 +126,7 @@ RSpec.describe Beyag::Client do
       let(:response_obj) { { body: success_response.to_json, status: 200 } }
 
       it 'fetches order information' do
-        response = client.query(params)
+        response = client.query(order_id)
 
         expect(response.successful?).to eq(true)
         expect(response.transaction["amount"]).to eq(100)
@@ -137,7 +137,7 @@ RSpec.describe Beyag::Client do
       let(:response_obj) { { body: failed_response.to_json, status: 401 } }
 
       it 'gets failed response from ERIP' do
-        response = client.query({})
+        response = client.query("")
 
         expect(response.successful?).to eq(false)
       end
