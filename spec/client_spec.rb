@@ -80,11 +80,11 @@ RSpec.describe Beyag::Client do
         },
         "payment_method" => {
           "type" => "erip",
-          "account_number" => "321", # вводит мерчант, 30 макс
-          "service_no" => "99999999", # из gateway, может быть несколько
-          "instruction" => ["Платежи -> Минск -> Интернет магазины -> Доставка счастья"], # введите номер заказа
-          "service_info" => ["Уважаемый Клиент", "Подтвердите оплату заказа №123"], # номер заказа, договора
-          "receipt" =>  ["Спасибо за оплату заказа №123, наши операторы свежутся с вами"] # что бы ты хотел показать на чеке
+          "account_number" => "321",
+          "service_no" => "99999999",
+          "instruction" => ["Платежи -> Минск -> Интернет магазины -> Доставка счастья"],
+          "service_info" => ["Уважаемый Клиент", "Подтвердите оплату заказа №123"],
+          "receipt" =>  ["Спасибо за оплату заказа №123, наши операторы свежутся с вами"]
         }
       }
     }
@@ -96,18 +96,20 @@ RSpec.describe Beyag::Client do
     context 'success request' do
       let(:response_obj) { { body: success_response.to_json, status: 200 } }
 
-      it 'gets pending response from ERIP' do
+      it 'gets pending response from BeYag' do
         response = client.payment(params)
 
         expect(response.successful?).to eq(true)
         expect(response.transaction["amount"]).to eq(100)
+        expect(response.payment_method["service_no"]).to eq(99999999)
+        expect(response.payment_method["account_number"]).to eq("321")
       end
     end
 
     context 'failed request' do
       let(:response_obj) { { body: failed_response.to_json, status: 401 } }
 
-      it 'gets failed response from ERIP' do
+      it 'gets failed response from BeYag' do
         response = client.payment(params)
 
         expect(response.successful?).to eq(false)
@@ -136,7 +138,7 @@ RSpec.describe Beyag::Client do
     context 'failed request' do
       let(:response_obj) { { body: failed_response.to_json, status: 401 } }
 
-      it 'gets failed response from ERIP' do
+      it 'gets failed response from BeYag' do
         response = client.query("")
 
         expect(response.successful?).to eq(false)

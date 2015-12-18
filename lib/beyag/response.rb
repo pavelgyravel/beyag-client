@@ -25,6 +25,14 @@ module Beyag
       data["transaction"]
     end
 
+    def payment_method
+      if pm = transaction["payment_method_type"]
+        transaction[pm]
+      else
+        {}
+      end
+    end
+
     def successful?
       (200..299).include?(status)
     end
