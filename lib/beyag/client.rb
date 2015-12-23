@@ -3,7 +3,7 @@ require 'logger'
 module Beyag
   class Client
 
-    GATEWAY_URL = "https://api.bepaid.by/beyag"
+    GATEWAY_URL = "https://api.bepaid.by/beyag".freeze
 
     attr_reader :shop_id, :secret_key
     cattr_accessor :proxy
@@ -14,7 +14,7 @@ module Beyag
     end
 
     def query(order_id)
-      build_response get("/payments/?id=#{order_id}")
+      build_response get("/payments/#{order_id}")
     end
 
     def payment(params)
@@ -51,16 +51,19 @@ module Beyag
     end
 
     def build_response(response)
-      response = Response.new(response)
-      response
+      Response.new(response)
     end
 
     def post(path, data = {})
-      request { connection.post(GATEWAY_URL << path, data.to_json) }
+      request { connection.post(full_path(path), data.to_json) }
     end
 
-    def get(path, data = {})
-      request { connection.get(GATEWAY_URL << path) }
+    def get(path)
+      request { connection.get full_path(path) }
+    end
+
+    def full_path(path)
+      [GATEWAY_URL, path].join
     end
 
   end
