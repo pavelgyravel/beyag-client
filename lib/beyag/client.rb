@@ -2,15 +2,13 @@ require 'logger'
 
 module Beyag
   class Client
-
-    GATEWAY_URL = "https://api.bepaid.by/beyag".freeze
-
-    attr_reader :shop_id, :secret_key
+    attr_reader :shop_id, :secret_key, :gateway_url
     cattr_accessor :proxy
 
     def initialize(params)
       @shop_id = params.fetch("shop_id")
       @secret_key = params.fetch("secret_key")
+      @gateway_url = params.fetch("gateway_url")
     end
 
     def query(order_id)
@@ -39,13 +37,10 @@ module Beyag
       @connection ||=
         begin
           connection = Faraday.new
-
           connection.request :json
           connection.headers = {'Content-Type' => 'application/json'}
           connection.basic_auth(shop_id, secret_key)
-
           connection.proxy(proxy) if proxy
-
           connection
         end
     end
@@ -63,8 +58,7 @@ module Beyag
     end
 
     def full_path(path)
-      [GATEWAY_URL, path].join
+      [gateway_url, path].join
     end
-
   end
 end

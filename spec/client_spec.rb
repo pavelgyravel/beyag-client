@@ -2,9 +2,13 @@ require 'spec_helper'
 require 'json'
 
 RSpec.describe Beyag::Client do
-  let(:client) { Beyag::Client.new("shop_id" => '1', "secret_key" => '123new') }
+  let(:client) do
+    Beyag::Client.new("shop_id" => '1',
+                      "secret_key" => '123new',
+                      "gateway_url" => 'https://api.bepaid.by/beyag')
+  end
 
-  let(:success_response) {
+  let(:success_response) do
     {
       "transaction" => {
         "type" => "payment",
@@ -50,17 +54,17 @@ RSpec.describe Beyag::Client do
         }
       }
     }
-  }
+  end
 
-  let(:failed_response) {
+  let(:failed_response) do
     {
       "message" => "Invalid shop_id/secret_key.",
       "errors" => { "system" => ["System error."] }
     }
-  }
+  end
 
   describe '#payment' do
-    let(:params) {
+    let(:params) do
       {
         "amount" => 100,
         "currency" => "BYR",
@@ -87,11 +91,11 @@ RSpec.describe Beyag::Client do
           "receipt" =>  ["Спасибо за оплату заказа №123, наши операторы свежутся с вами"]
         }
       }
-    }
+    end
 
-    before {
+    before do
       stub_request(:post, /api.bepaid.by\/beyag\/payment/).to_return(response_obj)
-    }
+    end
 
     context 'success request' do
       let(:response_obj) { { body: success_response.to_json, status: 200 } }
@@ -120,9 +124,9 @@ RSpec.describe Beyag::Client do
   describe '#query' do
     let(:order_id) { "bbb07d8b-eb16-40a3-97a7-7e52ae11c0e4" }
 
-    before {
+    before do
       stub_request(:get, /api.bepaid.by\/beyag\/payment/).to_return(response_obj)
-    }
+    end
 
     context 'success request' do
       let(:response_obj) { { body: success_response.to_json, status: 200 } }
