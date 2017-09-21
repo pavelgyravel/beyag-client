@@ -34,15 +34,15 @@ module Beyag
     end
 
     def connection
-      @connection ||=
-        begin
-          connection = Faraday.new
-          connection.request :json
-          connection.headers = {'Content-Type' => 'application/json'}
-          connection.basic_auth(shop_id, secret_key)
-          connection.proxy(proxy) if proxy
-          connection
-        end
+      @connection ||= Faraday::Connection.new do |c|
+        c.options[:open_timeout] = 5
+        c.options[:timeout] = 10
+        c.options[:proxy] = proxy if proxy
+        c.request :json
+        c.headers = {'Content-Type' => 'application/json'}
+        c.basic_auth(shop_id, secret_key)
+        c.adapter Faraday.default_adapter
+      end
     end
 
     def build_response(response)
