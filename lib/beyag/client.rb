@@ -1,4 +1,5 @@
 require 'logger'
+require 'ostruct'
 
 module Beyag
   class Client
@@ -6,17 +7,23 @@ module Beyag
     cattr_accessor :proxy
 
     def initialize(params)
-      @shop_id = params.fetch("shop_id")
-      @secret_key = params.fetch("secret_key")
-      @gateway_url = params.fetch("gateway_url")
+      @shop_id = params.fetch(:shop_id)
+      @secret_key = params.fetch(:secret_key)
+      @gateway_url = params.fetch(:gateway_url)
     end
 
     def query(order_id)
       build_response get("/payments/#{order_id}")
     end
 
-    def payment(params)
+    def erip_payment(params)
       build_response post('/payments', request: params)
+    end
+
+    %i[payment refund payout].each do |method|
+      define_method(method) do |params|
+        build_response post("/transactions/#{method}", request: params)
+      end
     end
 
     private
@@ -28,7 +35,7 @@ module Beyag
         yield
       rescue Exception => e
         logger = Logger.new(STDOUT)
-        logger.error("Request to store ERIP system. Error: #{e.message}\nTrace:\n#{e.backtrace.join("\n")}")
+        logger.error("Error: #{e.message}\nTrace:\n#{e.backtrace.join("\n")}")
         OpenStruct.new(status: 422)
       end
     end
