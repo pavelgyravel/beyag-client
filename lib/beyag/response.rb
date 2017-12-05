@@ -1,5 +1,3 @@
-require "ostruct"
-
 module Beyag
   class Response
     attr_reader :response, :data
@@ -14,7 +12,7 @@ module Beyag
     end
 
     def id
-      transaction["id"]
+      transaction && (transaction["id"] || transaction["uid"])
     end
 
     def service_no
@@ -26,7 +24,7 @@ module Beyag
     end
 
     def payment_method
-      if pm = transaction["payment_method_type"]
+      if transaction && (pm = transaction["payment_method_type"] || transaction["method_type"])
         transaction[pm]
       else
         {}
@@ -38,7 +36,7 @@ module Beyag
     end
 
     def error?
-      errors.present?
+      !!errors
     end
 
     def message

@@ -3,9 +3,9 @@ require 'json'
 
 RSpec.describe Beyag::Client do
   let(:client) do
-    Beyag::Client.new("shop_id" => '1',
-                      "secret_key" => '123new',
-                      "gateway_url" => 'https://api.bepaid.by/beyag')
+    Beyag::Client.new(shop_id: '1',
+                      secret_key: '123new',
+                      gateway_url: 'https://api.begateway.com/beyag')
   end
 
   let(:success_response) do
@@ -63,7 +63,7 @@ RSpec.describe Beyag::Client do
     }
   end
 
-  describe '#payment' do
+  describe '#erip_payment' do
     let(:params) do
       {
         "amount" => 100,
@@ -94,14 +94,14 @@ RSpec.describe Beyag::Client do
     end
 
     before do
-      stub_request(:post, /api.bepaid.by\/beyag\/payment/).to_return(response_obj)
+      stub_request(:post, /api.begateway.com\/beyag\/payment/).to_return(response_obj)
     end
 
     context 'success request' do
       let(:response_obj) { { body: success_response.to_json, status: 200 } }
 
       it 'gets pending response from BeYag' do
-        response = client.payment(params)
+        response = client.erip_payment(params)
 
         expect(response.successful?).to eq(true)
         expect(response.transaction["amount"]).to eq(100)
@@ -114,7 +114,7 @@ RSpec.describe Beyag::Client do
       let(:response_obj) { { body: failed_response.to_json, status: 401 } }
 
       it 'gets failed response from BeYag' do
-        response = client.payment(params)
+        response = client.erip_payment(params)
 
         expect(response.successful?).to eq(false)
       end
@@ -125,7 +125,7 @@ RSpec.describe Beyag::Client do
     let(:order_id) { "bbb07d8b-eb16-40a3-97a7-7e52ae11c0e4" }
 
     before do
-      stub_request(:get, /api.bepaid.by\/beyag\/payment/).to_return(response_obj)
+      stub_request(:get, /api.begateway.com\/beyag\/payment/).to_return(response_obj)
     end
 
     context 'success request' do
@@ -146,6 +146,177 @@ RSpec.describe Beyag::Client do
         response = client.query("")
 
         expect(response.successful?).to eq(false)
+      end
+    end
+  end
+
+  context 'transactions types' do
+    let(:params) do
+      {
+        "request": {
+          "amount": 1000,
+          "currency": "USD",
+          "description": "U pay safe test payment",
+          "email": "svitas1997@gmail.com",
+          "ip": "127.0.0.1",
+          "order_id": 212777,
+          "tracking_id": "TEST124512",
+          "success_url": "https://github.com",
+          "customer": {
+            "first_name": "Vitali",
+            "last_name": "Semenyuk",
+            "country": "BY",
+            "city": "Minsk",
+            "zip": "212101",
+            "address": "Dzerzhinskogo 95",
+            "phone": "+37292230101",
+            "birth_date": "16/12/1997"
+          },
+          "method": {
+            "type": "visa"
+          }
+        }
+      }
+    end
+
+    let(:successful_response) do
+      {
+        "transaction": {
+            "uid": "af546e09-982e-4df9-8167-107d229aaf4b",
+            "type": "payment",
+            "status": "pending",
+            "amount": 1000,
+            "currency": "USD",
+            "description": "U pay safe test payment",
+            "created_at": "2017-12-01T05:55:03Z",
+            "updated_at": "2017-12-01T05:55:04Z",
+            "method_type": "u_pay_safe",
+            "payment": {
+                "status": "pending",
+                "gateway_id": 47,
+                "ref_id": "58797-1512107703-1085",
+                "message": "Waiting"
+            },
+            "u_pay_safe": {
+                "type": "visa"
+            },
+            "customer": {
+                "email": "svitas1997@gmail.com",
+                "ip": "127.0.0.1"
+            },
+            "message": "Waiting",
+            "tracking_id": "TEST124512",
+            "billing_address": {
+                "first_name": "Vitali",
+                "last_name": "Semenyuk",
+                "country": "BY",
+                "city": "Minsk",
+                "zip": "212101",
+                "address": "Dzerzhinskogo 95",
+                "phone": "+37292230101",
+                "birth_date": "1997-12-16"
+            },
+            "form": {
+                "action": "https://testgateway.upaysafepayment.com/payment/initialize/58797-1512107703-1085",
+                "method": "GET",
+                "fields": []
+            }
+        }
+      }
+    end
+
+    let(:failed_response) do
+      {
+        "message": "Unprocessable entity",
+        "errors": {
+            "request": {
+              "amount": ["is missing"]
+            }
+        }
+      }
+    end
+
+    shared_examples 'successful beyag response' do |method|
+      it 'gets successful response from beyag' do
+        response = client.public_send(method, params)
+
+        expect(response).to be_successful
+        expect(response).not_to be_error
+        expect(response.status).to eq 200
+        expect(response.message).to eq 'Waiting'
+        expect(response.payment_method).to eq ({ 'type' => 'visa' })
+        expect(response.id).to eq 'af546e09-982e-4df9-8167-107d229aaf4b'
+        expect(response.transaction['amount']).to eq 1000
+        expect(response.errors).to be_nil
+      end
+    end
+
+    shared_examples 'failed beyag response' do |method|
+      it 'gets failed response from beyag' do
+        response = client.public_send(method, params)
+
+        expect(response).not_to be_successful
+        expect(response).to be_error
+        expect(response.status).to eq 422
+        expect(response.message).to eq 'Unprocessable entity'
+        expect(response.payment_method).to be_empty
+        expect(response.id).to be_nil
+        expect(response.transaction).to be_nil
+        expect(response.errors).to eq ({ "request" => { "amount" => ["is missing"] } })
+      end
+    end
+
+    describe '#payment' do
+      before do
+        stub_request(:post, /api.begateway.com\/beyag\/transactions\/payment/).to_return(response_obj)
+      end
+
+      context 'success request' do
+        let(:response_obj) { { body: successful_response.to_json, status: 200 } }
+
+        it_behaves_like 'successful beyag response', :payment
+      end
+
+      context 'failed request' do
+        let(:response_obj) { { body: failed_response.to_json, status: 422 } }
+
+        it_behaves_like 'failed beyag response', :payment
+      end
+    end
+
+    describe '#refund' do
+      before do
+        stub_request(:post, /api.begateway.com\/beyag\/transactions\/refund/).to_return(response_obj)
+      end
+
+      context 'success request' do
+        let(:response_obj) { { body: successful_response.to_json, status: 200 } }
+
+        it_behaves_like 'successful beyag response', :refund
+      end
+
+      context 'failed request' do
+        let(:response_obj) { { body: failed_response.to_json, status: 422 } }
+
+        it_behaves_like 'failed beyag response', :refund
+      end
+    end
+
+    describe '#payout' do
+      before do
+        stub_request(:post, /api.begateway.com\/beyag\/transactions\/payout/).to_return(response_obj)
+      end
+
+      context 'success request' do
+        let(:response_obj) { { body: successful_response.to_json, status: 200 } }
+
+        it_behaves_like 'successful beyag response', :payout
+      end
+
+      context 'failed request' do
+        let(:response_obj) { { body: failed_response.to_json, status: 422 } }
+
+        it_behaves_like 'failed beyag response', :payout
       end
     end
   end
