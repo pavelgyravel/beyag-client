@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "ERIP integration with bePaid.by"
   spec.description   = "ERIP integration with bePaid.by"
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = "https://github.com/begateway/beyag-client"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
