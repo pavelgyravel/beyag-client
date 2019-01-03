@@ -3,13 +3,14 @@ require 'ostruct'
 
 module Beyag
   class Client
-    attr_reader :shop_id, :secret_key, :gateway_url
+    attr_reader :shop_id, :secret_key, :gateway_url, :opts
     cattr_accessor :proxy
 
     def initialize(params)
       @shop_id = params.fetch(:shop_id)
       @secret_key = params.fetch(:secret_key)
       @gateway_url = params.fetch(:gateway_url)
+      @opts = params[:options] || {}
     end
 
     def query(order_id)
@@ -30,6 +31,9 @@ module Beyag
 
     attr_reader :response
 
+    DEFAULT_OPEN_TIMEOUT = 5
+    DEFAULT_TIMEOUT = 25
+
     def request
       begin
         yield
@@ -41,9 +45,9 @@ module Beyag
     end
 
     def connection
-      @connection ||= Faraday::Connection.new do |c|
-        c.options[:open_timeout] = 5
-        c.options[:timeout] = 10
+      @connection ||= Faraday::Connection.new(opts) do |c|
+        c.options[:open_timeout] ||= DEFAULT_OPEN_TIMEOUT
+        c.options[:timeout] ||= DEFAULT_TIMEOUT
         c.options[:proxy] = proxy if proxy
         c.request :json
         c.headers = {'Content-Type' => 'application/json'}
