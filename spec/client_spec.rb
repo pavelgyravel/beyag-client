@@ -354,9 +354,12 @@ RSpec.describe Beyag::Client do
   describe "connection" do
     context "when passed headers in options" do
       let(:headers) { {'X-Request-ID' => '112233'} }
-      let(:client)  { Beyag::Client.new(
-                                        shop_id: '1', secret_key: '1', gateway_url: 'url',
-                                        options: {headers: headers}) }
+      let(:client)  do
+        Beyag::Client.new(shop_id: '1',
+                          secret_key: '1',
+                          gateway_url: 'url',
+                          options: {headers: headers})
+      end
 
       it "adds this headers to connection" do
         expect(client.send(:connection).headers).to include(headers)

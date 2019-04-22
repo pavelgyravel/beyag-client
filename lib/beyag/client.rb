@@ -51,9 +51,7 @@ module Beyag
         c.options[:proxy] = proxy if proxy
         c.request :json
 
-        headers = {'Content-Type' => 'application/json'}
-        headers.update(opts[:headers]) if opts[:headers]
-        c.headers = headers
+        c.headers = {'Content-Type' => 'application/json'}.update(opts[:headers].to_h)
 
         c.basic_auth(shop_id, secret_key)
         c.adapter Faraday.default_adapter
