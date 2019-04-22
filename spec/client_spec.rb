@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'spec_helper'
 require 'json'
 
@@ -317,6 +318,48 @@ RSpec.describe Beyag::Client do
         let(:response_obj) { { body: failed_response.to_json, status: 422 } }
 
         it_behaves_like 'failed beyag response', :payout
+      end
+    end
+  end
+
+  describe "initialization" do
+    let(:shop_id) { '1' }
+    let(:secret_key) { '123new' }
+    let(:gateway_url) { 'https://api.begateway.com/beyag' }
+    let(:headers)     { {'X-Request-ID' => '112233'} }
+    let(:client) do
+      Beyag::Client.new(shop_id: shop_id,
+                        secret_key: secret_key,
+                        gateway_url: gateway_url,
+                        options: {headers: headers})
+    end
+
+    it "sets shop_id" do
+      expect(client.shop_id).to eq(shop_id)
+    end
+
+    it "sets secret_key" do
+      expect(client.secret_key).to eq(secret_key)
+    end
+
+    it "sets gateway_url" do
+      expect(client.gateway_url).to eq(gateway_url)
+    end
+
+    it "sets opts" do
+      expect(client.opts).to eq(headers: headers)
+    end
+  end
+
+  describe "connection" do
+    context "when passed headers in options" do
+      let(:headers) { {'X-Request-ID' => '112233'} }
+      let(:client)  { Beyag::Client.new(
+                                        shop_id: '1', secret_key: '1', gateway_url: 'url',
+                                        options: {headers: headers}) }
+
+      it "adds this headers to connection" do
+        expect(client.send(:connection).headers).to include(headers)
       end
     end
   end

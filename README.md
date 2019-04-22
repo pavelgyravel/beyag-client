@@ -22,7 +22,28 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Intialization client
+
+``` ruby
+client = Beyag::Client.new(
+  shop_id: 'YOUR SHOP ID',
+  secret_key: 'YOUR SHOP SECRET KEY',
+  gateway_url: 'YOUR GATEWAY URL'
+)
+```
+
+### Headers
+
+You can set headers for client, for example:
+
+``` ruby
+client = Beyag::Client.new(
+  shop_id: 'YOUR SHOP ID',
+  secret_key: 'YOUR SHOP SECRET KEY',
+  gateway_url: 'YOUR GATEWAY URL',
+  options: {headers: {'X-Request-Id' => '123334455'}}
+)
+```
 
 ## Development
 
@@ -38,4 +59,3 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
