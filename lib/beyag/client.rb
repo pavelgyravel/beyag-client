@@ -50,7 +50,9 @@ module Beyag
         c.options[:timeout] ||= DEFAULT_TIMEOUT
         c.options[:proxy] = proxy if proxy
         c.request :json
-        c.headers = {'Content-Type' => 'application/json'}
+
+        c.headers = {'Content-Type' => 'application/json'}.update(opts[:headers].to_h)
+
         c.basic_auth(shop_id, secret_key)
         c.adapter Faraday.default_adapter
       end
