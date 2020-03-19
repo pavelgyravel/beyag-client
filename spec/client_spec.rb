@@ -64,6 +64,44 @@ RSpec.describe Beyag::Client do
     }
   end
 
+  describe '#volt_bank_list' do
+    subject { client.volt_bank_list('volt_client_id') }
+
+    before { stub_request(:get, /volt_bank_list/).to_return(body: body.to_json) }
+
+    context 'successful beyag response' do
+      let(:body) do
+        {
+          "response" => {
+            "data" => {
+              "channel" => [
+                {
+                  "country" => 'United Kingdom',
+                  "name" => 'Ozone (UK Open Banking Model Bank)',
+                  "id" => 'bbbbbbbb-0001-bbbb-bbbb-bbbbbbbbbbbb'
+                }
+              ]
+            }
+          }
+        }
+      end
+
+      it { expect(subject.data).to eq(body) }
+    end
+
+    context 'failed beyag response' do
+      let(:body) do
+        {
+          "response" => {
+            "description" => "Something went wrong with the BankList request"
+          }
+        }
+      end
+
+      it { expect(subject.data).to eq(body) }
+    end
+  end
+
   describe '#erip_payment' do
     let(:params) do
       {
