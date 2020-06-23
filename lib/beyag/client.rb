@@ -21,8 +21,8 @@ module Beyag
       build_response post('/payments', request: params)
     end
 
-    def volt_bank_list(volt_client_id)
-      build_response get("/volt_bank_list/#{volt_client_id}")
+    def bank_list(gateway_id)
+      build_response get("/gateways/#{gateway_id}/bank_list")
     end
 
     %i[payment refund payout].each do |method|

@@ -64,10 +64,10 @@ RSpec.describe Beyag::Client do
     }
   end
 
-  describe '#volt_bank_list' do
-    subject { client.volt_bank_list('volt_client_id') }
+  describe '#bank_list' do
+    subject { client.bank_list(1) }
 
-    before { stub_request(:get, /volt_bank_list/).to_return(body: body.to_json) }
+    before { stub_request(:get, /bank_list/).to_return(body: body.to_json) }
 
     context 'successful beyag response' do
       let(:body) do
