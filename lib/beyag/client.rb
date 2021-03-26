@@ -62,10 +62,6 @@ module Beyag
       end
     end
 
-    def build_response(response)
-      Response.new(response)
-    end
-
     def post(path, data = {})
       request { connection.post(full_path(path), data.to_json) }
     end
