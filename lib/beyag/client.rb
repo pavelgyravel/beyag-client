@@ -44,7 +44,7 @@ module Beyag
       rescue Exception => e
         logger = Logger.new(STDOUT)
         logger.error("Error: #{e.message}\nTrace:\n#{e.backtrace.join("\n")}")
-        OpenStruct.new(status: 422)
+        Response::Error.new(e)
       end
     end
 
