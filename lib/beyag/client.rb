@@ -14,20 +14,20 @@ module Beyag
     end
 
     def query(order_id)
-      build_response get("/payments/#{order_id}")
+      get("/payments/#{order_id}")
     end
 
     def erip_payment(params)
-      build_response post('/payments', request: params)
+      post('/payments', request: params)
     end
 
     def bank_list(gateway_id)
-      build_response get("/gateways/#{gateway_id}/bank_list")
+      get("/gateways/#{gateway_id}/bank_list")
     end
 
     %i[payment refund payout].each do |method|
       define_method(method) do |params|
-        build_response post("/transactions/#{method}", request: params)
+        post("/transactions/#{method}", request: params)
       end
     end
 
@@ -40,7 +40,7 @@ module Beyag
 
     def request
       begin
-        yield
+        Response.new(yield)
       rescue Exception => e
         logger = Logger.new(STDOUT)
         logger.error("Error: #{e.message}\nTrace:\n#{e.backtrace.join("\n")}")
