@@ -1,5 +1,31 @@
 module Beyag
   class Response
+    class Error
+      def initialize(error)
+        @error = error
+      end
+
+      def successful?
+        false
+      end
+
+      def message
+        @error.message
+      end
+
+      def errors
+        { 'error' => message }
+      end
+
+      def data
+        { 'status' => 'error', 'message' => message, 'errors' => errors }
+      end
+
+      %i[id service_no transaction payment_method status].each do |name|
+        define_method(name) {}
+      end
+    end
+
     attr_reader :response, :data
 
     def initialize(response)
