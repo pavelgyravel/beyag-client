@@ -358,6 +358,24 @@ RSpec.describe Beyag::Client do
         it_behaves_like 'failed beyag response', :payout
       end
     end
+
+    describe '#credit' do
+      before do
+        stub_request(:post, /api.begateway.com\/beyag\/transactions\/credit/).to_return(response_obj)
+      end
+
+      context 'success request' do
+        let(:response_obj) { { body: successful_response.to_json, status: 200 } }
+
+        it_behaves_like 'successful beyag response', :credit
+      end
+
+      context 'failed request' do
+        let(:response_obj) { { body: failed_response.to_json, status: 422 } }
+
+        it_behaves_like 'failed beyag response', :credit
+      end
+    end
   end
 
   describe "initialization" do

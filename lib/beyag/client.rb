@@ -25,7 +25,7 @@ module Beyag
       build_response get("/gateways/#{gateway_id}/bank_list")
     end
 
-    %i[payment refund payout].each do |method|
+    %i[payment refund payout credit].each do |method|
       define_method(method) do |params|
         build_response post("/transactions/#{method}", request: params)
       end
