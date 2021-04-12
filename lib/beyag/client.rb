@@ -14,20 +14,20 @@ module Beyag
     end
 
     def query(order_id)
-      build_response get("/payments/#{order_id}")
+      get("/payments/#{order_id}")
     end
 
     def erip_payment(params)
-      build_response post('/payments', request: params)
+      post('/payments', request: params)
     end
 
     def bank_list(gateway_id)
-      build_response get("/gateways/#{gateway_id}/bank_list")
+      get("/gateways/#{gateway_id}/bank_list")
     end
 
     %i[payment refund payout credit].each do |method|
       define_method(method) do |params|
-        build_response post("/transactions/#{method}", request: params)
+        post("/transactions/#{method}", request: params)
       end
     end
 
@@ -40,11 +40,11 @@ module Beyag
 
     def request
       begin
-        yield
+        Response.new(yield)
       rescue Exception => e
         logger = Logger.new(STDOUT)
         logger.error("Error: #{e.message}\nTrace:\n#{e.backtrace.join("\n")}")
-        OpenStruct.new(status: 422)
+        Response::Error.new(e)
       end
     end
 
@@ -60,10 +60,6 @@ module Beyag
         c.basic_auth(shop_id, secret_key)
         c.adapter Faraday.default_adapter
       end
-    end
-
-    def build_response(response)
-      Response.new(response)
     end
 
     def post(path, data = {})

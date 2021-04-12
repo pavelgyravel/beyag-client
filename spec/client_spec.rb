@@ -421,5 +421,19 @@ RSpec.describe Beyag::Client do
         expect(client.send(:connection).headers).to include(headers)
       end
     end
+
+    context 'when there are network issues' do
+      let(:client) { Beyag::Client.new(shop_id: '1', secret_key: '1', gateway_url: 'http://example.com') }
+
+      before do
+        stub_request(:get, /example.com\/payment/).and_raise(Net::ReadTimeout)
+      end
+
+      it 'returns error response' do
+        expect {
+          expect(client.query('')).to be_kind_of(Beyag::Response::Error)
+        }.not_to raise_exception
+      end
+    end
   end
 end
