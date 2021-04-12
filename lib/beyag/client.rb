@@ -3,7 +3,7 @@ require 'ostruct'
 
 module Beyag
   class Client
-    attr_reader :shop_id, :secret_key, :gateway_url, :opts
+    attr_reader :shop_id, :secret_key, :gateway_url, :opts, :logger
     cattr_accessor :proxy
 
     def initialize(params)
@@ -11,6 +11,7 @@ module Beyag
       @secret_key = params.fetch(:secret_key)
       @gateway_url = params.fetch(:gateway_url)
       @opts = params[:options] || {}
+      @logger = params[:logger] || Logger.new(STDOUT)
     end
 
     def query(order_id)
@@ -42,7 +43,6 @@ module Beyag
       begin
         Response.new(yield)
       rescue Exception => e
-        logger = Logger.new(STDOUT)
         logger.error("Error: #{e.message}\nTrace:\n#{e.backtrace.join("\n")}")
         Response::Error.new(e)
       end
