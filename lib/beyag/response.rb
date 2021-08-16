@@ -76,5 +76,13 @@ module Beyag
     def status
       response.status.to_i
     end
+
+    def status_url
+      data['status_url']
+    end
+
+    def response_url
+      data['response_url']
+    end
   end
 end
