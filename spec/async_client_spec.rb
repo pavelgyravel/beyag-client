@@ -71,6 +71,7 @@ RSpec.describe Beyag::AsyncClient do
         it 'returns success response' do
           response = subject
 
+          expect(response.request_id).to eq(request_id)
           expect(response.status_url).to eq("https://api.begateway.com/beyag/async/status/#{request_id}")
           expect(response.response_url).to eq("https://api.begateway.com/beyag/async/result/#{request_id}")
         end

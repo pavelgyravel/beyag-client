@@ -84,5 +84,9 @@ module Beyag
     def response_url
       data['response_url']
     end
+
+    def request_id
+      data['request_id']
+    end
   end
 end
