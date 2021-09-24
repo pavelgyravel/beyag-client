@@ -42,7 +42,7 @@ module Beyag
     def request
       begin
         Response.new(yield)
-      rescue Exception => e
+      rescue StandardError => e
         logger.error("Error: #{e.message}\nTrace:\n#{e.backtrace.join("\n")}")
         Response::Error.new(e)
       end
