@@ -436,4 +436,36 @@ RSpec.describe Beyag::Client do
       end
     end
   end
+  
+  describe '#recover' do
+    let(:params) do
+      {
+        :uid=>'uid123',
+        :notify_merchant=>false,
+        :transaction=>{
+          :status=>'successful',
+          :message=>'Updated manually',
+          :paid_at=>'2021-01-01T12:12:12Z'
+        },
+        :action=>{:message=>'Updated manually', :rrn=>'444', :state=>'successful'}
+      }
+    end
+
+    let(:response_body) { { 'response' => { 'message' => 'Transaction uid123 was updated' } } }
+
+    before do
+      stub_request(:post, /api.begateway.com\/beyag\/transactions\/uid123\/recover/).to_return(response_obj)
+    end
+
+    context 'success request' do
+      let(:response_obj) { { body: response_body.to_json, status: 200 } }
+
+      it 'gets success response from BeYag' do
+        response = client.recover(params)
+
+        expect(response.successful?).to eq(true)
+        expect(response.data.dig('response', 'message')).to eq('Transaction uid123 was updated')
+      end
+    end
+  end
 end
