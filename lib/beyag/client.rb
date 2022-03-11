@@ -18,6 +18,15 @@ module Beyag
       get("/payments/#{order_id}")
     end
 
+    def query_transaction(uid)
+      get("/transactions/#{uid}")
+    end
+
+    def recover(params)
+      path = "/transactions/#{params[:uid]}/recover"
+      post(path, request: params)
+    end
+
     def erip_payment(params)
       post('/payments', request: params)
     end

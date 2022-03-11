@@ -436,4 +436,96 @@ RSpec.describe Beyag::Client do
       end
     end
   end
+  
+  describe '#recover' do
+    let(:params) do
+      {
+        uid: 'uid123',
+        notify_merchant: false,
+        transaction: {
+          status: 'successful',
+          message: 'Updated manually',
+          paid_at: '2021-01-01T12:12:12Z'
+        },
+        action: { message: 'Updated manually', rrn: '444', state: 'successful' }
+      }
+    end
+
+    let(:response_body) { { 'response' => { 'message' => 'Transaction uid123 was updated' } } }
+
+    before do
+      stub_request(:post, /api.begateway.com\/beyag\/transactions\/uid123\/recover/).to_return(response_obj)
+    end
+
+    context 'success request' do
+      let(:response_obj) { { body: response_body.to_json, status: 200 } }
+
+      it 'gets success response from BeYag' do
+        response = client.recover(params)
+
+        expect(response.successful?).to eq(true)
+        expect(response.data.dig('response', 'message')).to eq('Transaction uid123 was updated')
+      end
+    end
+  end
+
+  describe '#query_transaction' do
+    let(:order_id) { 'uid123' }
+
+    before do
+      stub_request(:get, /api.begateway.com\/beyag\/transactions/).to_return(response_obj)
+    end
+
+    let(:transaction_response) do
+      {
+        'transaction'=>{
+          'uid'=>'uid123',
+          'type'=>'payment',
+          'status'=>'successful',
+          'amount'=>100,
+          'currency'=>'USD',
+          'description'=>'Test Payment',
+          'created_at'=>'0000-00-00T00:00:00Z',
+          'updated_at'=>'0000-00-00T00:00:00Z',
+          'method_type'=>'erip',
+          'receipt_url'=>'/test_url',
+          'payment'=>{
+            'status'=>'successful',
+            'gateway_id'=>nil,
+            'ref_id'=>'ref_id'
+          },
+          'test'=>false,
+          'additional_data'=>{'payment_method'=>{'type'=>'alternative'}
+          }
+        }
+      }
+    end
+
+    let(:error_response) do
+      {
+        'message'=>'Not found.'
+      }
+    end
+
+    context 'success request' do
+      let(:response_obj) { { body: transaction_response.to_json, status: 200 } }
+
+      it 'get response from BeYag' do
+        response = client.query_transaction(order_id)
+
+        expect(response.successful?).to eq(true)
+        expect(response.transaction['amount']).to eq(100)
+      end
+    end
+
+    context 'failed request' do
+      let(:response_obj) { { body: error_response.to_json, status: 404 } }
+
+      it 'gets failed response from BeYag' do
+        response = client.query_transaction('')
+
+        expect(response.successful?).to eq(false)
+      end
+    end
+  end
 end
