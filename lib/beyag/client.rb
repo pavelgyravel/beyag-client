@@ -66,7 +66,7 @@ module Beyag
 
         c.headers = {'Content-Type' => 'application/json'}.update(opts[:headers].to_h)
 
-        c.basic_auth(shop_id, secret_key)
+        c.request :authorization, :basic, shop_id, secret_key
         c.adapter Faraday.default_adapter
       end
     end
